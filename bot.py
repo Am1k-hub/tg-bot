@@ -18,17 +18,21 @@ dp = Dispatcher()
 def создать_клавиатуру():
     """Возвращает клавиатуру с кнопками калькулятора"""
     
-    # Первый ряд (ДОБАВЛЕНЫ СКОБКИ!)
-    ряд1 = [
+    # Первый ряд - СКОБКИ В ОТДЕЛЬНОЙ СТРОКЕ ДЛЯ НАГЛЯДНОСТИ
+    ряд_скобки = [
         InlineKeyboardButton(text="(", callback_data="("),
         InlineKeyboardButton(text=")", callback_data=")"),
+    ]
+    
+    # Второй ряд (цифры)
+    ряд1 = [
         InlineKeyboardButton(text="7", callback_data="7"),
         InlineKeyboardButton(text="8", callback_data="8"),
         InlineKeyboardButton(text="9", callback_data="9"),
         InlineKeyboardButton(text="/", callback_data="/"),
     ]
     
-    # Второй ряд
+    # Третий ряд
     ряд2 = [
         InlineKeyboardButton(text="4", callback_data="4"),
         InlineKeyboardButton(text="5", callback_data="5"),
@@ -36,7 +40,7 @@ def создать_клавиатуру():
         InlineKeyboardButton(text="*", callback_data="*"),
     ]
     
-    # Третий ряд
+    # Четвертый ряд
     ряд3 = [
         InlineKeyboardButton(text="1", callback_data="1"),
         InlineKeyboardButton(text="2", callback_data="2"),
@@ -44,7 +48,7 @@ def создать_клавиатуру():
         InlineKeyboardButton(text="-", callback_data="-"),
     ]
     
-    # Четвертый ряд
+    # Пятый ряд
     ряд4 = [
         InlineKeyboardButton(text="0", callback_data="0"),
         InlineKeyboardButton(text=".", callback_data="."),
@@ -52,14 +56,21 @@ def создать_клавиатуру():
         InlineKeyboardButton(text="+", callback_data="+"),
     ]
     
-    # Пятый ряд (кнопки управления)
+    # Шестой ряд (кнопки управления)
     ряд5 = [
         InlineKeyboardButton(text="C", callback_data="C"),
         InlineKeyboardButton(text="←", callback_data="DEL"),
     ]
     
     # Собираем все ряды в клавиатуру
-    клавиатура = InlineKeyboardMarkup(inline_keyboard=[ряд1, ряд2, ряд3, ряд4, ряд5])
+    клавиатура = InlineKeyboardMarkup(inline_keyboard=[
+        ряд_скобки,  # ← отдельный ряд для скобок
+        ряд1, 
+        ряд2, 
+        ряд3, 
+        ряд4, 
+        ряд5
+    ])
     return клавиатура
 
 # ===== КОМАНДА СТАРТ =====
@@ -70,7 +81,12 @@ async def команда_старт(сообщение: Message):
     
     # Отправляем сообщение с клавиатурой
     await сообщение.answer(
-        "🔢 КАЛЬКУЛЯТОР\nВводи пример кнопками:\nСкобки работают! Например: (2+3)*4",
+        "🔢 КАЛЬКУЛЯТОР СО СКОБКАМИ\n\n"
+        "📌 Примеры со скобками:\n"
+        "• 2*(2+3) = 10\n"
+        "• (5+3)*2 = 16\n"
+        "• (10-4)/(2) = 3\n\n"
+        "Нажимай на кнопки:",
         reply_markup=создать_клавиатуру()
     )
 
@@ -90,15 +106,15 @@ async def обработать_нажатие(нажатие: CallbackQuery):
                 результат = int(результат)
             
             выражения_пользователей[id_пользователя] = str(результат)
-            текст_ответа = f"{текущее} = {результат}"
+            текст_ответа = f"📊 {текущее} = {результат}"
         except Exception as e:
-            текст_ответа = f"❌ Ошибка: {текущее}\n{str(e)}"
+            текст_ответа = f"❌ Ошибка в выражении: {текущее}\n💡 Проверь скобки!"
             выражения_пользователей[id_пользователя] = ""
     
     # КНОПКА "ОЧИСТИТЬ ВСЁ"
     elif кнопка == "C":
         выражения_пользователей[id_пользователя] = ""
-        текст_ответа = "✅ Очищено"
+        текст_ответа = "✅ Очищено. Вводи новый пример со скобками!"
     
     # КНОПКА "УДАЛИТЬ ПОСЛЕДНИЙ СИМВОЛ"
     elif кнопка == "DEL":
@@ -116,21 +132,24 @@ async def обработать_нажатие(нажатие: CallbackQuery):
         reply_markup=создать_клавиатуру()
     )
     
-    # Подтверждаем нажатие (чтобы убрать часики на кнопке)
+    # Подтверждаем нажатие
     await нажатие.answer()
 
 # ===== ЕСЛИ ПОЛЬЗОВАТЕЛЬ ПИШЕТ ТЕКСТ =====
 @dp.message()
 async def любой_текст(сообщение: Message):
     await сообщение.answer(
-        "❌ Пользуйся кнопками! Скобки есть в первом ряду: ( и )",
+        "❌ Пользуйся кнопками!\n\n"
+        "Скобки ( и ) находятся в самом верхнем ряду!\n"
+        "Пример: 2 * ( 2 + 3 )",
         reply_markup=создать_клавиатуру()
     )
 
 # ===== ЗАПУСК =====
 async def main():
     print("✅ Бот запущен!")
-    print("✅ Скобки добавлены! Можно решать примеры типа (2+3)*4")
+    print("✅ Скобки добавлены в отдельный ряд!")
+    print("✅ Примеры со скобками работают: 2*(2+3)=10")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
