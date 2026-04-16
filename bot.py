@@ -12,20 +12,16 @@ TOKEN = os.getenv("TOKEN")
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Словарь для хранения выражений каждого пользователя
-user_expressions = {}
+user_expressions = {} # хранилище 
 
-# ===== КЛАВИАТУРА =====
-def get_keyboard():
+def get_keyboard(): # сама клавиатура 
     """Возвращает клавиатуру с кнопками калькулятора"""
     
-    # Первый ряд - скобки
     row_brackets = [
         InlineKeyboardButton(text="(", callback_data="("),
         InlineKeyboardButton(text=")", callback_data=")"),
     ]
     
-    # Второй ряд (цифры)
     row1 = [
         InlineKeyboardButton(text="7", callback_data="7"),
         InlineKeyboardButton(text="8", callback_data="8"),
@@ -33,7 +29,6 @@ def get_keyboard():
         InlineKeyboardButton(text="/", callback_data="/"),
     ]
     
-    # Третий ряд
     row2 = [
         InlineKeyboardButton(text="4", callback_data="4"),
         InlineKeyboardButton(text="5", callback_data="5"),
@@ -41,7 +36,6 @@ def get_keyboard():
         InlineKeyboardButton(text="*", callback_data="*"),
     ]
     
-    # Четвертый ряд
     row3 = [
         InlineKeyboardButton(text="1", callback_data="1"),
         InlineKeyboardButton(text="2", callback_data="2"),
@@ -49,7 +43,6 @@ def get_keyboard():
         InlineKeyboardButton(text="-", callback_data="-"),
     ]
     
-    # Пятый ряд
     row4 = [
         InlineKeyboardButton(text="0", callback_data="0"),
         InlineKeyboardButton(text=".", callback_data="."),
@@ -57,13 +50,11 @@ def get_keyboard():
         InlineKeyboardButton(text="+", callback_data="+"),
     ]
     
-    # Шестой ряд (кнопки управления)
     row5 = [
         InlineKeyboardButton(text="C", callback_data="C"),
         InlineKeyboardButton(text="←", callback_data="DEL"),
     ]
     
-    # Собираем все ряды в клавиатуру
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         row_brackets,
         row1, 
@@ -74,26 +65,23 @@ def get_keyboard():
     ])
     return keyboard
 
-# ===== КОМАНДА СТАРТ =====
-@dp.message(Command("start"))
+@dp.message(Command("start")) # команда старт
 async def start_command(message: Message):
     # Запоминаем, что у этого пользователя пустое выражение
     user_expressions[message.from_user.id] = ""
     
-    # Отправляем сообщение с клавиатурой
     await message.answer(
         reply_markup=get_keyboard()
     )
 
-# ===== ОБРАБОТКА НАЖАТИЙ НА КНОПКИ =====
-@dp.callback_query()
+@dp.callback_query() # обрабатывает нажатие всех кнопок
 async def handle_click(callback: CallbackQuery):
     user_id = callback.from_user.id
     button = callback.data
     current = user_expressions.get(user_id, "")
     
-    # КНОПКА "РАВНО"
-    if button == "=":
+    
+    if button == "=": # кнопка равно 
         try:
             result = eval(current)
             if isinstance(result, float) and result.is_integer():
@@ -105,17 +93,15 @@ async def handle_click(callback: CallbackQuery):
             text = f"❌ Ошибка в выражении: {current}\n💡 Проверь скобки!"
             user_expressions[user_id] = ""
     
-    # КНОПКА "ОЧИСТИТЬ ВСЁ"
-    elif button == "C":
+
+    elif button == "C": # кнопка для очистки всего
         user_expressions[user_id] = ""
         text = "✅ Очищено. Вводи новый пример со скобками!"
     
-    # КНОПКА "УДАЛИТЬ ПОСЛЕДНИЙ СИМВОЛ"
-    elif button == "DEL":
+    elif button == "DEL": # кнопка для удаления последнего символа
         user_expressions[user_id] = current[:-1]
         text = f"📝 {user_expressions[user_id] or 'пусто'}"
     
-    # ОБЫЧНЫЕ КНОПКИ
     else:
         user_expressions[user_id] = current + button
         text = f"📝 {user_expressions[user_id]}"
@@ -127,14 +113,12 @@ async def handle_click(callback: CallbackQuery):
     
     await callback.answer()
 
-# ===== ЕСЛИ ПОЛЬЗОВАТЕЛЬ ПИШЕТ ТЕКСТ =====
 @dp.message()
 async def any_text(message: Message):
     await message.answer(
         reply_markup=get_keyboard()
     )
 
-# ===== ЗАПУСК =====
 async def main():
     print("Бот запущен!")
     print("Скобки добавлены в отдельный ряд!")
