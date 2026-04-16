@@ -82,7 +82,6 @@ async def start_command(message: Message):
     
     # Отправляем сообщение с клавиатурой
     await message.answer(
-        "🔢 КАЛЬКУЛЯТОР СО СКОБКАМИ\n\nНажимай на кнопки:",
         reply_markup=get_keyboard()
     )
 
@@ -132,7 +131,6 @@ async def handle_click(callback: CallbackQuery):
 @dp.message()
 async def any_text(message: Message):
     await message.answer(
-        "❌ Пользуйся кнопками!\n\nСкобки ( и ) находятся в самом верхнем ряду!",
         reply_markup=get_keyboard()
     )
 
