@@ -119,10 +119,10 @@ async def any_text(message: Message):
         reply_markup=get_keyboard()
     )
 
-async def _main_():
+async def main():
     print("Бот запущен!")
     print("Скобки добавлены в отдельный ряд!")
     await dp.start_polling(bot)
 
-if _name_ == "_main_":
-    asyncio.run(_main_())
+if __name__ == "__main__":
+    asyncio.run(main())
