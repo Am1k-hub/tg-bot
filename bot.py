@@ -124,5 +124,5 @@ async def main():
     print("Скобки добавлены в отдельный ряд!")
     await dp.start_polling(bot)
 
-if name == "main":
+if _name_ == "_main_":
     asyncio.run(main())
