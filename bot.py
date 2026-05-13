@@ -67,14 +67,14 @@ def get_keyboard(): # сама клавиатура
 
 @dp.message(Command("start")) # команда старт
 async def start_command(message: Message):
-    # Запоминаем, что у этого пользователя пустое выражение
+    # Запоминает что у юзера пустое выражение
     user_expressions[message.from_user.id] = ""
     
     await message.answer(
         reply_markup=get_keyboard()
     )
 
-@dp.callback_query() # обрабатывает нажатие всех кнопок
+@dp.callback_query() # обрабатывает нажатие кнопок
 async def handle_click(callback: CallbackQuery):
     user_id = callback.from_user.id
     button = callback.data
