@@ -67,14 +67,14 @@ def get_keyboard(): # сама клавиатура
 
 @dp.message(Command("start")) # команда старт
 async def start_command(message: Message):
-    # Запоминает что у юзера пустое выражение
+    # Запоминаем, что у этого пользователя пустое выражение
     user_expressions[message.from_user.id] = ""
     
     await message.answer(
         reply_markup=get_keyboard()
     )
 
-@dp.callback_query() # обрабатывает нажатие кнопок
+@dp.callback_query() # обрабатывает нажатие всех кнопок
 async def handle_click(callback: CallbackQuery):
     user_id = callback.from_user.id
     button = callback.data
@@ -124,5 +124,5 @@ async def main():
     print("Скобки добавлены в отдельный ряд!")
     await dp.start_polling(bot)
 
-if __name__ == "__main__":
+if name == "main":
     asyncio.run(main())
