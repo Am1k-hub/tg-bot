@@ -71,6 +71,7 @@ async def start_command(message: Message):
     user_expressions[message.from_user.id] = ""
     
     await message.answer(
+         text="🧮 Калькулятор запущен!",
         reply_markup=get_keyboard()
     )
 
@@ -116,6 +117,7 @@ async def handle_click(callback: CallbackQuery):
 @dp.message()
 async def any_text(message: Message):
     await message.answer(
+        text="Пожалуйста, используйте кнопки:",
         reply_markup=get_keyboard()
     )
 
